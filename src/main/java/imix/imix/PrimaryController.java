@@ -135,9 +135,10 @@ public class PrimaryController {
        }
     	System.out.println("topSameRows : " + topSameRows);
     	System.out.println("bottomSameRows : " + bottomSameRows);
-    	
 
-        int[]                           topAfterPixels  = new int[ tWidth * (tHeight - bottomSameRows)];
+
+    	int tAfterHeight = tHeight - bottomSameRows;
+        int[]                           topAfterPixels  = new int[ tWidth * tAfterHeight];
         int topIndex = 0;
         
         // ピクセルmHeight
@@ -147,12 +148,11 @@ public class PrimaryController {
 	            int index   = ( y * tWidth ) + x;
 	            int pixel   = topPixels[ index ];
 		        topAfterPixels[ index ] = pixel;
-		        topIndex = index + 1;
 	        }
 	    }
-    	System.out.println("topIndex : " + topIndex);
 
-        int[]                           bottomAfterPixels  = new int[ bWidth * (bHeight - topSameRows)];
+    	int bAfterHeight = bHeight - topSameRows;    	
+        int[]                           bottomAfterPixels  = new int[ bWidth * bAfterHeight];
 	        // ピクセルmHeight
 	    for( int y = topSameRows ; y < bHeight; y++ ) {
 	        for( int x = 0 ; x < bWidth ; x++ )
@@ -162,8 +162,106 @@ public class PrimaryController {
 	            bottomAfterPixels[ index - (topSameRows * bWidth) ] = pixel;
 	        }
 	    }
+	    
+	    int minHeight = 0;
+	    if(tAfterHeight <= bAfterHeight) {
+	    	minHeight = tAfterHeight;
+	    } else {
+	    	minHeight = bAfterHeight;
+	    }
+	    
 
-    	int sameRows = bottomSameRows + topSameRows;
+	    int checkRowCount = 50;
+        int[]                           checkSameRow  = new int[ bWidth * checkRowCount ];
+        // ピクセルmHeight
+	    for( int y = 0 ; y < checkRowCount; y++ ) {
+	        for( int x = 0 ; x < bWidth ; x++ )
+	        {
+	            int index   = ( y * bWidth ) + x;
+	            int pixel   = bottomAfterPixels[ index ];
+	            checkSameRow[ index ] = pixel;
+	        }
+	    }
+	    
+    	int shikichi = 150;
+    	int maxSamePixels = 0;
+    	int maxSameRow = 0;
+    	//行で確認
+	    for( int y = 0 ; y < tAfterHeight -  checkRowCount; y++) {
+    	    int sameAfterRowPixels = 0;
+	        for( int x = 0 ; x < tWidth * checkRowCount ; x++ ) {
+	        	int index = ( y * tWidth ) + x;
+	            int pixel   = topAfterPixels[ index ];
+	            int chkPixel = checkSameRow[x];
+	            if(y == 213) {
+	                // ピクセルを反転
+	                // α成分を作成
+		            if(chkPixel == pixel) {
+		            	/*
+		                int a       = ( pixel >> 24 ) & 0xFF;
+			             
+		                // 赤成分を作成
+		                int r       = 0xFF - ( ( pixel >> 16 ) & 0xFF );
+		             
+		                // 緑成分を作成
+		                int g       = 0xFF - ( ( pixel >> 8  ) & 0xFF );
+		                 
+		                // 青成分を作成
+		                int b       = 0xFF - ( pixel & 0xFF );
+		                 
+		                // ピクセルを設定
+		                pixel           = ( a << 24 ) | ( r << 16 ) | ( g << 8 ) | b;
+		                topAfterPixels[ index ] = pixel;*/
+		            }
+	            }
+
+	            // 同じ画素の場合カウント
+	            if(chkPixel == pixel) {
+	            	sameAfterRowPixels++;
+	            	/*
+	            	System.out.println("sameAfterRowPixels : " + sameAfterRowPixels);
+	                // ピクセルを反転
+	                // α成分を作成
+	                int a       = ( pixel >> 24 ) & 0xFF;
+	             
+	                // 赤成分を作成
+	                int r       = 0xFF - ( ( pixel >> 16 ) & 0xFF );
+	             
+	                // 緑成分を作成
+	                int g       = 0xFF - ( ( pixel >> 8  ) & 0xFF );
+	                 
+	                // 青成分を作成
+	                int b       = 0xFF - ( pixel & 0xFF );
+	                 
+	                // ピクセルを設定
+	                pixel           = ( a << 24 ) | ( r << 16 ) | ( g << 8 ) | b;
+	                topAfterPixels[ index ] = pixel;*/
+	            }
+	        }
+
+	        if(sameAfterRowPixels > maxSamePixels) {
+	        	maxSamePixels = sameAfterRowPixels; 
+	        	maxSameRow = y; 
+	        }
+	    }
+    	System.out.println("最も似ている行 : " + maxSameRow + "行");
+    	System.out.println("似ている画素数 : " + maxSamePixels + "px");
+
+
+    	int tCutAfterHeight = maxSameRow;	
+        int[]                           topCutAfterPixels  = new int[ tWidth * tCutAfterHeight];
+        
+	    for( int y = 0; y < tCutAfterHeight; y++) {
+	        for( int x = 0 ; x < tWidth ; x++ ) {
+	        	int index = ( y * tWidth ) + x;
+	            int pixel   = topAfterPixels[ index ];
+	            topCutAfterPixels[index] = pixel;
+	            topIndex = index + 1;
+	        }
+	    }
+    	System.out.println("topIndex : " + topIndex);
+	    
+    	int sameRows = bottomSameRows + topSameRows + (tAfterHeight - tCutAfterHeight);
     	int sameMixPixels = (sameRows * bWidth);
     	System.out.println("sameMixPixels : " + sameMixPixels);
     	int mWidth = tWidth;
@@ -185,7 +283,7 @@ public class PrimaryController {
                 
                 if(index < topIndex) {
                 	//System.out.println("topIndex : " + index);
-                    int pixel   = topAfterPixels[ index ];
+                    int pixel   = topCutAfterPixels[ index ];
                 	mixPixels[ index ] = pixel;
                 } else {
                 	int bottomIndex = index - topIndex;                	
@@ -194,7 +292,7 @@ public class PrimaryController {
                 }
             }
        }
-    	System.out.println("mixed");
+        System.out.println("mixed");
 
        // ピクセル配列を設定
        writer.setPixels(0 , 0 , mWidth , mHeight , format, mixPixels, 0 , mWidth);
