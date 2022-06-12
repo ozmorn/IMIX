@@ -69,7 +69,6 @@ public class PrimaryController {
         int[]                           topPixels  = new int[ tWidth * tHeight ]; 
         imgT.getPixelReader().getPixels( 0 , 0 , tWidth , tHeight ,
                                         format, topPixels, 0 , tWidth );
-        int topIndex = 0;
         // ピクセル操作
         for( int y = 0 ; y < tHeight ; y++ ) {
             for( int x = 0 ; x < tWidth ; x++ )
@@ -79,31 +78,102 @@ public class PrimaryController {
                  
                 // ピクセルを設定
                 topPixels[ index ] = pixel;
-                topIndex = index + 1;
             }
        }
-    	System.out.println("topIndex : " + topIndex);
         
         // ピクセル配列(フォーマットはARGBの順)を取得
         int[]                           bottomPixels  = new int[ bWidth * bHeight ]; 
         imgB.getPixelReader().getPixels( 0 , 0 , bWidth , bHeight ,
                                         format, bottomPixels, 0 , bWidth );
+        int samePixels = 0;
+        boolean topRow = true;
+        int topSameRows = 1;
+
         // ピクセルmHeight
         for( int y = 0 ; y < bHeight ; y++ ) {
             for( int x = 0 ; x < bWidth ; x++ )
             {
                 int index   = ( y * bWidth ) + x;
-                int pixel   = bottomPixels[ index ];
-                bottomPixels[ index ] = pixel;
+                int pixelBottom   = bottomPixels[ index ];
+                int pixelTop   = topPixels[ index ];
+                if(pixelTop == pixelBottom && topRow) {
+                	samePixels++;
+                }
             }
+            
+            if(samePixels != bWidth) {
+            	topRow = false;
+            } else {
+            	topSameRows++;
+            }
+            samePixels = 0;
        }
+        
+        boolean bottomRow = true;
+        int bottomSameRows = 1;
+        int sameBottomPixels = 0;
+        
+        // ピクセルmHeight
+        for( int y = bHeight - 1 ; y >= 0 ; y-- ) {
+            for( int x = 0 ; x < bWidth ; x++ )
+            {
+                int index   = ( y * bWidth ) + x;
+                int pixelBottom   = bottomPixels[ index ];
+                int pixelTop   = topPixels[ index ];
+                if(pixelTop == pixelBottom && bottomRow) {
+                	sameBottomPixels++;
+                }
+            }
 
+            if(sameBottomPixels != bWidth) {
+            	bottomRow = false;
+            } else {
+            	bottomSameRows++;
+            }
+            
+            sameBottomPixels = 0;
+       }
+    	System.out.println("topSameRows : " + topSameRows);
+    	System.out.println("bottomSameRows : " + bottomSameRows);
+    	
+
+        int[]                           topAfterPixels  = new int[ tWidth * (tHeight - bottomSameRows)];
+        int topIndex = 0;
+        
+        // ピクセルmHeight
+	    for( int y = 0 ; y < tHeight - bottomSameRows ; y++ ) {
+	        for( int x = 0 ; x < tWidth ; x++ )
+	        {
+	            int index   = ( y * tWidth ) + x;
+	            int pixel   = topPixels[ index ];
+		        topAfterPixels[ index ] = pixel;
+		        topIndex = index + 1;
+	        }
+	    }
+    	System.out.println("topIndex : " + topIndex);
+
+        int[]                           bottomAfterPixels  = new int[ bWidth * (bHeight - topSameRows)];
+	        // ピクセルmHeight
+	    for( int y = topSameRows ; y < bHeight; y++ ) {
+	        for( int x = 0 ; x < bWidth ; x++ )
+	        {
+	            int index   = ( y * bWidth ) + x;
+	            int pixel   = bottomPixels[ index ];
+	            bottomAfterPixels[ index - (topSameRows * bWidth) ] = pixel;
+	        }
+	    }
+
+    	int sameRows = bottomSameRows + topSameRows;
+    	int sameMixPixels = (sameRows * bWidth);
+    	System.out.println("sameMixPixels : " + sameMixPixels);
     	int mWidth = tWidth;
-    	int mHeight = tHeight + bHeight;
-        int[]                           mixPixels  = new int[ mWidth * mHeight ];
+    	int mHeight = tHeight + bHeight - sameRows;
+    	System.out.println("mWidth : " + mWidth);
+    	System.out.println("mHeight : " + mHeight);
+        int[]                           mixPixels  = new int[ mWidth * mHeight];
 
         // 複製したイメージを作成
-        WritableImage   mImg        = new WritableImage( mWidth , mHeight );
+        WritableImage   mImg        = new WritableImage( mWidth , mHeight);
         PixelWriter     writer      = mImg.getPixelWriter();
         
         // ピクセルmHeight
@@ -115,11 +185,11 @@ public class PrimaryController {
                 
                 if(index < topIndex) {
                 	//System.out.println("topIndex : " + index);
-                    int pixel   = topPixels[ index ];
+                    int pixel   = topAfterPixels[ index ];
                 	mixPixels[ index ] = pixel;
                 } else {
                 	int bottomIndex = index - topIndex;                	
-                    int pixel   = bottomPixels[ bottomIndex];
+                    int pixel   = bottomAfterPixels[ bottomIndex ];
                 	mixPixels[ index ] = pixel;
                 }
             }
