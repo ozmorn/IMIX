@@ -32,9 +32,8 @@
                   <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                </padding>
             </VBox>
-                  <ImageView fx:id="mixedImage" fitHeight="216.0" fitWidth="325.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" />
             <Button fx:id="imageMixButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#imageMixing" text="画像結合" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-            <Button fx:id="imageSavebutton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#imageSaving" text="画像結合" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <ImageView fx:id="mixedImage" fitHeight="216.0" fitWidth="325.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" />
          </children>
       </GridPane>
    </children>

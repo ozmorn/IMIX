@@ -1,13 +1,12 @@
 package imix.imix;
 
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.IntBuffer;
 
-import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,6 +19,7 @@ public class PrimaryController {
 	@FXML private ImageView imageT;
 	@FXML private ImageView imageB;
 	@FXML private ImageView mixedImage;
+	public String ImageName = null;
     
     @FXML
     public void folderOpenActionTop() {
@@ -30,6 +30,7 @@ public class PrimaryController {
     	if (file != null) {
 	    	System.out.println(file.getPath());
 	        Image img = new Image("file:" + file.getPath());
+	        this.ImageName = file.getPath();
 	        this.imageT.setImage(img);
     	}
     }
@@ -75,21 +76,8 @@ public class PrimaryController {
             {
                 int index   = ( y * tWidth ) + x;
                 int pixel   = topPixels[ index ];
-                // ピクセルを反転
-                // α成分を作成
-                int a       = ( pixel >> 24 ) & 0xFF;
-             
-                // 赤成分を作成
-                int r       = 0xFF - ( ( pixel >> 16 ) & 0xFF );
-             
-                // 緑成分を作成
-                int g       = 0xFF - ( ( pixel >> 8  ) & 0xFF );
-                 
-                // 青成分を作成
-                int b       = 0xFF - ( pixel & 0xFF );
                  
                 // ピクセルを設定
-                pixel           = ( a << 24 ) | ( r << 16 ) | ( g << 8 ) | b;
                 topPixels[ index ] = pixel;
                 topIndex = index + 1;
             }
@@ -101,15 +89,14 @@ public class PrimaryController {
         imgB.getPixelReader().getPixels( 0 , 0 , bWidth , bHeight ,
                                         format, bottomPixels, 0 , bWidth );
         // ピクセルmHeight
-        /*for( int y = 0 ; y < bHeight ; y++ ) {
+        for( int y = 0 ; y < bHeight ; y++ ) {
             for( int x = 0 ; x < bWidth ; x++ )
             {
                 int index   = ( y * bWidth ) + x;
                 int pixel   = bottomPixels[ index ];
                 bottomPixels[ index ] = pixel;
-                
             }
-       }*/
+       }
 
     	int mWidth = tWidth;
     	int mHeight = tHeight + bHeight;
@@ -119,7 +106,6 @@ public class PrimaryController {
         WritableImage   mImg        = new WritableImage( mWidth , mHeight );
         PixelWriter     writer      = mImg.getPixelWriter();
         
-    	boolean tst =false;
         // ピクセルmHeight
         for( int y = 0 ; y < mHeight ; y++ ) {
             for( int x = 0 ; x < mWidth ; x++ )
@@ -132,15 +118,9 @@ public class PrimaryController {
                     int pixel   = topPixels[ index ];
                 	mixPixels[ index ] = pixel;
                 } else {
-                	int bottomIndex = index - topIndex;
-                	if(!tst) {
-                    	System.out.println("index : " + index);
-                    	System.out.println("bottomIndex : " + bottomIndex);
-                	}
-                	
+                	int bottomIndex = index - topIndex;                	
                     int pixel   = bottomPixels[ bottomIndex];
                 	mixPixels[ index ] = pixel;
-                	tst = true;
                 }
             }
        }
@@ -148,19 +128,18 @@ public class PrimaryController {
 
        // ピクセル配列を設定
        writer.setPixels(0 , 0 , mWidth , mHeight , format, mixPixels, 0 , mWidth);
-       writer.write(null, new IIOImage((RenderedImage) mImg, null, null), writeParam);
+       
+       //String saveName = "";
+       File f = new File(this.ImageName + "mixed." + "png");
+       try {
+		ImageIO.write(SwingFXUtils.fromFXImage(mImg, null), "png", f);
+		
+		} catch (IOException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+       
        this.mixedImage.setImage(mImg);
 
-    }
-    
-    @FXML
-    public void imageSaving() {
-    	Image resultImg = this.mixedImage.getImage();
-
-    }
-    
-    private boolean saveImage(WritableImage img, String base, String fmt) throws IOException{
-        File f = new File(base + "." + fmt);
-        return ImageIO.write(javafx.embed.SwingFXUtils.fromFXImage(img, null), fmt, f);
     }
 }
