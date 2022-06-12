@@ -87,7 +87,8 @@ public class PrimaryController {
                                         format, bottomPixels, 0 , bWidth );
         int samePixels = 0;
         boolean topRow = true;
-        int topSameRows = 1;
+        int topSameRows = 2;
+        double threshold = 0.8;
 
         // ピクセルmHeight
         for( int y = 0 ; y < bHeight ; y++ ) {
@@ -101,7 +102,7 @@ public class PrimaryController {
                 }
             }
             
-            if(samePixels != bWidth) {
+            if(samePixels < (int) (bWidth * threshold)) {
             	topRow = false;
             } else {
             	topSameRows++;
@@ -110,7 +111,7 @@ public class PrimaryController {
        }
         
         boolean bottomRow = true;
-        int bottomSameRows = 1;
+        int bottomSameRows = 2;
         int sameBottomPixels = 0;
         
         // ピクセルmHeight
@@ -125,7 +126,7 @@ public class PrimaryController {
                 }
             }
 
-            if(sameBottomPixels != bWidth) {
+            if(sameBottomPixels < (int) (bWidth * threshold)) {
             	bottomRow = false;
             } else {
             	bottomSameRows++;
