@@ -3,18 +3,30 @@ package imix.imix;
 import java.io.File;
 import java.io.IOException;
 import java.nio.IntBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 
@@ -30,43 +42,204 @@ public class PrimaryController {
 	@FXML private Text textImageMixed;
 	@FXML private TextField threshold;
 	@FXML private TextField checkRowCount;
+	@FXML private TextField textSaveName;
 	public String ImageName = null;
+	public String ImagePath = null;
+	final String THRESHOLD_DEF = "0.7";
+	final String ROWCOUNT_DEF = "50";
+	final String TEXTIMAGETOP_DEF = "上側の画像を選択してください";
+	final String TEXTIMAGEBOTTOM_DEF = "下側の画像を選択してください";
+	final String TEXTIMAGEMIXED_DEF = "ここに画像が出力されます";
     
     @FXML
     public void folderOpenActionTop() {
     	FileChooser fc = new FileChooser();
+    	fc.getExtensionFilters().addAll(
+    			  new FileChooser.ExtensionFilter("イメージファイル", "*.jpg", "*.png", "*.gif")
+    			);
+
     	// 初期フォルダをホームに
-    	fc.setInitialDirectory(new File(System.getProperty("user.home")));
+    	if(ImagePath != null) {
+        	fc.setInitialDirectory(new File(ImagePath));
+    	} else {
+        	fc.setInitialDirectory(new File(System.getProperty("user.home")));
+    	}
     	File file = fc.showOpenDialog(null);
     	if (file != null) {
 	    	System.out.println(file.getPath());
+	    	this.ImagePath = file.getParent();
+	    	System.out.println(this.ImagePath);
 	        Image img = new Image("file:" + file.getPath());
-	        this.ImageName = file.getPath();
+	        this.ImageName = file.getName();
 	        this.imageT.setImage(img);
 	        this.imageTopPane.setBackground(null);
 	        this.textImageTop.setText(null);
+
+	    	String filenameT = file.getPath();
+	    	String regex = "[0-9]+(?!.*[0-9]+)";
+	    	Pattern pa = Pattern.compile(regex);
+	    	Matcher m1 = pa.matcher(filenameT);
+	    	String intStr = "";
+	    	if (m1.find()) {
+	    		// マッチした部分文字列の表示を行う
+	    		intStr = m1.group();
+	    		System.out.println(m1.group());
+	    	}
+	    	System.out.println(intStr);
+	    	if(!intStr.isBlank() && this.imageB.getImage() == null) {
+	    		int fileNumT = Integer.parseInt(intStr);
+	    		fileNumT++;
+	    		Integer i = Integer.valueOf(fileNumT);
+	    		String fileNumTNext = i.toString();
+	    		String filenameB =filenameT.replaceAll("[0-9]+(?!.*[0-9]+)", fileNumTNext);
+	        	System.out.println(filenameB);
+		        Image imgB = new Image("file:" + filenameB);
+		        Path p = Paths.get(filenameB);
+		        if (Files.exists(p)){
+			        this.imageB.setImage(imgB);
+			        this.imageBottomPane.setBackground(null);
+			        this.textImageBottom.setText(null);
+	        	}else{
+	        	  System.out.println("画像は存在しません");
+	        	}
+	    	}
     	}
     }
     
     @FXML
     public void folderOpenActionBottom() {
     	FileChooser fc = new FileChooser();
+    	fc.getExtensionFilters().addAll(
+  			  new FileChooser.ExtensionFilter("イメージファイル", "*.jpg", "*.png", "*.gif")
+  			);
+
     	// 初期フォルダをホームに
-    	fc.setInitialDirectory(new File(System.getProperty("user.home")));
+    	if(ImagePath != null) {
+        	fc.setInitialDirectory(new File(ImagePath));
+    	} else {
+        	fc.setInitialDirectory(new File(System.getProperty("user.home")));
+    	}
     	File file = fc.showOpenDialog(null);
     	if (file != null) {
 	    	System.out.println(file.getPath());
+	    	this.ImagePath = file.getParent();
 	        Image img = new Image("file:" + file.getPath());
 	        this.imageB.setImage(img);
 	        this.imageBottomPane.setBackground(null);
 	        this.textImageBottom.setText(null);
+
+	    	String filenameB = file.getPath();
+	    	String regex = "[0-9]+(?!.*[0-9]+)";
+	    	Pattern pa = Pattern.compile(regex);
+	    	Matcher m1 = pa.matcher(filenameB);
+	    	String intStr = "";
+	    	if (m1.find()) {
+	    		// マッチした部分文字列の表示を行う
+	    		intStr = m1.group();
+	    		System.out.println(m1.group());
+	    	}
+	    	System.out.println(intStr);
+	    	if(!intStr.isBlank() && this.imageT.getImage() == null) {
+	    		int fileNumB = Integer.parseInt(intStr);
+	    		fileNumB--;
+	    		Integer i = Integer.valueOf(fileNumB);
+	    		String fileNumBNeo = i.toString();
+	    		String filenameT =filenameB.replaceAll("[0-9]+(?!.*[0-9]+)", fileNumBNeo);
+	        	System.out.println(filenameT);
+		        Image imgT = new Image("file:" + filenameT);
+		        Path p = Paths.get(filenameT);
+		        if (Files.exists(p)){
+			        this.imageT.setImage(imgT);
+			        this.imageTopPane.setBackground(null);
+			        this.textImageTop.setText(null);
+		        } else {
+	        	  System.out.println("画像は存在しません");
+		        }
+	    	}
     	}
+    }
+    @FXML
+    public void resetImage() {
+
+        this.imageT.setImage(null);
+        this.imageTopPane.setBackground(
+        		new Background(
+        				new BackgroundFill( Color.TEAL , new CornerRadii(0) , Insets.EMPTY )
+        			)
+        		);
+        this.textImageTop.setText(this.TEXTIMAGETOP_DEF);
+
+        this.imageB.setImage(null);
+        this.imageBottomPane.setBackground(
+        		new Background(
+        				new BackgroundFill( Color.TEAL , new CornerRadii(0) , Insets.EMPTY )
+        			)
+        		);
+        this.textImageBottom.setText(this.TEXTIMAGEBOTTOM_DEF);
+
+        this.mixedImage.setImage(null);
+        this.imageMixedPane.setBackground(
+        		new Background(
+        				new BackgroundFill( Color.TEAL , new CornerRadii(0) , Insets.EMPTY )
+        			)
+        		);
+        this.textImageMixed.setText(this.TEXTIMAGEMIXED_DEF);
+        this.threshold.setText(this.THRESHOLD_DEF);
+        this.checkRowCount.setText(this.ROWCOUNT_DEF);
+        this.textSaveName.setText(null);
     }
     
     @FXML
     public void imageMixing() {
     	Image imgT = this.imageT.getImage();
     	Image imgB = this.imageB.getImage();
+    	if(imgT == null ) {
+        	Alert alrtImgT = new Alert(AlertType.WARNING); //アラートを作成
+        	alrtImgT.setTitle("上側イメージの選択");
+        	alrtImgT.setHeaderText(null);
+        	alrtImgT.setContentText("上側の画像を選択してください");
+        	alrtImgT.showAndWait(); //表示
+        	
+        	return;
+    	}
+    	
+    	if(imgB == null ) {
+        	Alert alrtImgB = new Alert(AlertType.WARNING); //アラートを作成
+        	alrtImgB.setTitle("下側イメージの選択");
+        	alrtImgB.setHeaderText(null);
+        	alrtImgB.setContentText("下側の画像を選択してください");
+        	alrtImgB.showAndWait(); //表示
+        	
+        	return;
+    	}
+        Pattern patternRowCount = Pattern.compile("^[0-9]+$");
+        Matcher matcherRowCount = patternRowCount.matcher(this.checkRowCount.getText());
+        
+        if (matcherRowCount.find()) {
+            System.out.println("正規表現にマッチしました。");
+        } else {
+        	Alert alrtRowCount = new Alert(AlertType.WARNING); //アラートを作成
+        	alrtRowCount.setTitle("縦重複範囲");
+        	alrtRowCount.setHeaderText(null);
+        	alrtRowCount.setContentText("縦重複範囲は正の整数で入力してください");
+        	alrtRowCount.showAndWait(); //表示
+        	
+        	return;
+    	}
+        Pattern patternThreshold = Pattern.compile("^(0)(\\.[0-9]+[1-9])$");
+        Matcher matcherThreshold = patternThreshold.matcher(this.threshold.getText());
+        
+        if (matcherThreshold.find()) {
+            System.out.println("正規表現にマッチしました。");
+        } else {
+        	Alert alrtThreshold = new Alert(AlertType.WARNING); //アラートを作成
+        	alrtThreshold.setTitle("枠許容率");
+        	alrtThreshold.setHeaderText(null);
+        	alrtThreshold.setContentText("枠許容率は1未満の正の少数で入力してください");
+        	alrtThreshold.showAndWait(); //表示
+        	
+        	return;
+    	}
     	
     	int tWidth = (int) imgT.getWidth();
     	int tHeight = (int) imgT.getHeight();
@@ -78,6 +251,11 @@ public class PrimaryController {
     	int bHeight = (int) imgB.getHeight();
     	System.out.println("BOTTOMimage_width : " + bWidth);
     	System.out.println("BOTTOMimage_height : " + bHeight);
+    	
+    	if(tWidth != bWidth) {
+    		if(tWidth < bWidth) bWidth = tWidth;
+    		if(tWidth > bWidth) tWidth = bWidth;
+    	}
         
         // ピクセル配列(フォーマットはARGBの順)を取得
         WritablePixelFormat<IntBuffer>  format  = WritablePixelFormat.getIntArgbInstance();
@@ -303,19 +481,56 @@ public class PrimaryController {
        }
         System.out.println("mixed");
 
+        //作成したいファイルのパスを渡してFileオブジェクトを作成
+        File newfile = new File(this.ImagePath + "\\結合後\\");
+        //mkdirメソッドを実行
+        if (newfile.mkdir()){
+        //ディレクトリを作成できたら「Success.」と表示。
+                System.out.println("Success.");
+        }else{
+        //ディレクトリを作成できなかったら「Failed.」と表示。
+                System.out.println("Failed.");
+       }
+        
        // ピクセル配列を設定
        writer.setPixels(0 , 0 , mWidth , mHeight , format, mixPixels, 0 , mWidth);
        
-       //String saveName = "";
-       File f = new File(this.ImageName + "mixed." + "png");
-       try {
-		ImageIO.write(SwingFXUtils.fromFXImage(mImg, null), "png", f);
-		
-		} catch (IOException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		}
-       
+	   String woext = this.ImageName.substring(0,this.ImageName.lastIndexOf('.'));
+   	   String saveFileName = woext.replaceAll("[0-9]", "");
+   	   if(!this.textSaveName.getText().isBlank()) {
+   		   saveFileName = this.textSaveName.getText();
+   	   }
+   	   saveFileName = this.ImagePath + "\\結合後\\" + saveFileName;
+   	   saveFileName = saveFileName.replaceAll("[_]$", "");
+   	   saveFileName = saveFileName + ".png";
+		int imageCount = 1;
+		String saveFileNameOrg = saveFileName.substring(0,saveFileName.lastIndexOf('.'));
+
+		while(true) {
+
+		    Path p = Paths.get(saveFileName);
+	        if (Files.exists(p)){
+	        	imageCount++;
+	    		Integer i = Integer.valueOf(imageCount);
+	    		String fileNumTNext = i.toString();
+	        	saveFileName = saveFileNameOrg + "_" + fileNumTNext + ".png";
+
+	        }else {
+	            File f = new File(saveFileName);
+
+	            try {
+	     		ImageIO.write(SwingFXUtils.fromFXImage(mImg, null), "png", f);
+	     		
+	     		} catch (IOException e) {
+	     			// TODO 自動生成された catch ブロック
+	     			e.printStackTrace();
+	     		}
+	            
+	            
+				break;
+	        }
+	   }
+       System.out.println("savedName : " + saveFileName);
        this.mixedImage.setImage(mImg);
        this.imageMixedPane.setBackground(null);
        this.textImageMixed.setText(null);

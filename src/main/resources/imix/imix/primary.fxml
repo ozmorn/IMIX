@@ -24,7 +24,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <StackPane fx:id="imageTopPane" layoutX="14.0" layoutY="14.0" prefHeight="367.0" prefWidth="325.0" style="-fx-background-color: #66CC66;">
+      <StackPane fx:id="imageTopPane" layoutX="14.0" layoutY="14.0" prefHeight="367.0" prefWidth="325.0" style="-fx-background-color: TEAL;">
          <children>
             <Text fx:id="textImageTop" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="上側の画像を選択してください">
                <font>
@@ -38,7 +38,7 @@
             </ImageView>
          </children>
       </StackPane>
-      <StackPane fx:id="imageBottomPane" layoutX="14.0" layoutY="406.0" prefHeight="367.0" prefWidth="325.0" style="-fx-background-color: #66CC66;">
+      <StackPane fx:id="imageBottomPane" layoutX="14.0" layoutY="406.0" prefHeight="367.0" prefWidth="325.0" style="-fx-background-color: TEAL;">
          <children>
             <Text fx:id="textImageBottom" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="下側の画像を選択してください">
                <font>
@@ -52,7 +52,7 @@
             </ImageView>
          </children>
       </StackPane>
-      <StackPane fx:id="imageMixedPane" layoutX="545.0" layoutY="14.0" prefHeight="767.0" prefWidth="330.0" style="-fx-background-color: #66CC66;">
+      <StackPane fx:id="imageMixedPane" layoutX="545.0" layoutY="14.0" prefHeight="767.0" prefWidth="330.0" style="-fx-background-color: TEAL;">
          <children>
             <Text fx:id="textImageMixed" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="ここに画像が出力されます">
                <font>
@@ -62,14 +62,44 @@
                   <ImageView fx:id="mixedImage" fitHeight="764.0" fitWidth="330.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </StackPane>
-      <Text layoutX="356.0" layoutY="277.0" strokeType="OUTSIDE" strokeWidth="0.0" text="枠許容割合（%）" />
-      <Text layoutX="356.0" layoutY="203.0" strokeType="OUTSIDE" strokeWidth="0.0" text="縦重複範囲（px）" />
+      <Text layoutX="356.0" layoutY="277.0" strokeType="OUTSIDE" strokeWidth="0.0" text="枠許容率">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font></Text>
+      <Text layoutX="356.0" layoutY="203.0" strokeType="OUTSIDE" strokeWidth="0.0" text="縦重複範囲（px）">
+         <font>
+            <Font name="System Bold Italic" size="15.0" />
+         </font></Text>
       <TextField fx:id="checkRowCount" layoutX="356.0" layoutY="208.0" prefHeight="31.0" prefWidth="178.0" promptText="ここに重複範囲を入力" text="50" />
-      <TextField fx:id="threshold" layoutX="356.0" layoutY="281.0" prefHeight="31.0" prefWidth="178.0" promptText="ここに閾値を入力" text="0.9" />
-      <Text layoutX="354.0" layoutY="422.0" strokeType="OUTSIDE" strokeWidth="0.0" text="※結合後画像は自動で保存されます">
+      <TextField fx:id="threshold" layoutX="356.0" layoutY="281.0" prefHeight="31.0" prefWidth="178.0" promptText="ここに閾値を入力" text="0.7" />
+      <TextField fx:id="textSaveName" layoutX="356.0" layoutY="427.0" prefHeight="31.0" prefWidth="178.0" promptText="保存名を入力" />
+      <Text layoutX="356.0" layoutY="480.0" strokeType="OUTSIDE" strokeWidth="0.0" text="・画像は結合後、自動で保存されます">
          <font>
             <Font size="12.0" />
          </font>
       </Text>
+      <Text layoutX="356.0" layoutY="422.0" strokeType="OUTSIDE" strokeWidth="0.0" text="保存名">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Text>
+      <Text layoutX="356.0" layoutY="497.0" strokeType="OUTSIDE" strokeWidth="0.0" text="・保存名は未入力の場合、上側の">
+         <font>
+            <Font size="12.0" />
+         </font>
+      </Text>
+      <Text layoutX="356.0" layoutY="514.0" strokeType="OUTSIDE" strokeWidth="0.0" text="画像名が優先されます">
+         <font>
+            <Font size="12.0" />
+         </font>
+      </Text>
+      <Button fx:id="resetButton" alignment="CENTER" contentDisplay="CENTER" layoutX="377.0" layoutY="531.0" mnemonicParsing="false" onMouseClicked="#resetImage" prefHeight="52.0" prefWidth="135.0" style="-fx-background-color: #003366;" text="リセット" textAlignment="CENTER" textFill="WHITE">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="System Bold" size="21.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>
