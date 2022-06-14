@@ -6,6 +6,7 @@ import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,12 +17,16 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -43,6 +48,7 @@ public class PrimaryController {
 	@FXML private TextField threshold;
 	@FXML private TextField checkRowCount;
 	@FXML private TextField textSaveName;
+	@FXML private CheckBox saveCheck;
 	public String ImageName = null;
 	public String ImagePath = null;
 	final String THRESHOLD_DEF = "0.7";
@@ -107,6 +113,190 @@ public class PrimaryController {
     }
     
     @FXML
+    public void imageTopDragOver(DragEvent event) {
+    // ファイルの場合だけ受け付ける例
+    Dragboard db = event.getDragboard();
+    if (db.hasFiles()) {
+    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+    }
+    event.consume();
+    }
+    
+    @FXML
+    public void imageTopDragDropped(DragEvent event) {
+    boolean success = false;
+    // ファイルの場合だけ受け付ける例
+    Dragboard db = event.getDragboard();
+    if (db.hasFiles()) {
+    List<File> file = db.getFiles();
+    System.out.println(file);
+    success = true;
+    
+		if (file != null) {
+	    	String fileDropPath = file.toString();
+    		String filePath = trimStart(fileDropPath, "[");
+    		filePath = trimEnd(filePath, "]");
+
+    		Path fileImagePath = Paths.get(filePath);
+	    	System.out.println(filePath);
+	        this.ImageName = fileImagePath.getFileName().toString();
+	    	System.out.println("ImageName : " + this.ImageName);
+	    	this.ImagePath = filePath.replaceAll(this.ImageName, "");
+	    	System.out.println("ImagePath : " + this.ImagePath);
+	        Image img = new Image("file:" + filePath);
+	        this.imageT.setImage(img);
+	        this.imageTopPane.setBackground(null);
+	        this.textImageTop.setText(null);
+	
+	    	String filenameT = filePath;
+	    	String regex = "[0-9]+(?!.*[0-9]+)";
+	    	Pattern pa = Pattern.compile(regex);
+	    	Matcher m1 = pa.matcher(filenameT);
+	    	String intStr = "";
+	    	if (m1.find()) {
+	    		// マッチした部分文字列の表示を行う
+	    		intStr = m1.group();
+	    		System.out.println(m1.group());
+	    	}
+	    	System.out.println(intStr);
+	    	if(!intStr.isBlank() && this.imageB.getImage() == null) {
+	    		int fileNumT = Integer.parseInt(intStr);
+	    		fileNumT++;
+	    		Integer i = Integer.valueOf(fileNumT);
+	    		String fileNumTNext = i.toString();
+	    		String filenameB =filenameT.replaceAll("[0-9]+(?!.*[0-9]+)", fileNumTNext);
+	        	System.out.println(filenameB);
+		        Image imgB = new Image("file:" + filenameB);
+		        Path p = Paths.get(filenameB);
+		        if (Files.exists(p)){
+			        this.imageB.setImage(imgB);
+			        this.imageBottomPane.setBackground(null);
+			        this.textImageBottom.setText(null);
+	        	}else{
+	        	  System.out.println("画像は存在しません");
+	        	}
+	    	}
+		}
+    }
+
+    event.setDropCompleted(success);
+    event.consume();
+    }
+    
+    @FXML
+    public void imageBottomDragOver(DragEvent event) {
+    // ファイルの場合だけ受け付ける例
+    Dragboard db = event.getDragboard();
+    if (db.hasFiles()) {
+    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+    }
+    event.consume();
+    }
+    
+    @FXML
+    public void imageBottomDragDropped(DragEvent event) {
+    boolean success = false;
+    // ファイルの場合だけ受け付ける例
+    Dragboard db = event.getDragboard();
+    if (db.hasFiles()) {
+    List<File> file = db.getFiles();
+    System.out.println(file);
+    success = true;
+    
+		if (file != null) {
+	    	String fileDropPath = file.toString();
+    		String filePath = trimStart(fileDropPath, "[");
+    		filePath = trimEnd(filePath, "]");
+
+    		Path fileImagePath = Paths.get(filePath);
+	    	System.out.println(filePath);
+	        this.ImageName = fileImagePath.getFileName().toString();
+	    	System.out.println("ImageName : " + this.ImageName);
+	    	this.ImagePath = filePath.replaceAll(this.ImageName, "");
+	    	System.out.println("ImagePath : " + this.ImagePath);
+	        Image img = new Image("file:" + filePath);
+	        this.imageB.setImage(img);
+	        this.imageBottomPane.setBackground(null);
+	        this.textImageBottom.setText(null);
+	
+	    	String filenameB = filePath;
+	    	String regex = "[0-9]+(?!.*[0-9]+)";
+	    	Pattern pa = Pattern.compile(regex);
+	    	Matcher m1 = pa.matcher(filenameB);
+	    	String intStr = "";
+	    	if (m1.find()) {
+	    		// マッチした部分文字列の表示を行う
+	    		intStr = m1.group();
+	    		System.out.println(m1.group());
+	    	}
+	    	System.out.println(intStr);
+	    	if(!intStr.isBlank() && this.imageT.getImage() == null) {
+	    		int fileNumB = Integer.parseInt(intStr);
+	    		fileNumB--;
+	    		Integer i = Integer.valueOf(fileNumB);
+	    		String fileNumBNeo = i.toString();
+	    		String filenameT =filenameB.replaceAll("[0-9]+(?!.*[0-9]+)", fileNumBNeo);
+	        	System.out.println("filenameT : " + filenameT);
+		        Image imgT = new Image("file:" + filenameT);
+		        Path p = Paths.get(filenameT);
+		        if (Files.exists(p)){
+			        this.imageT.setImage(imgT);
+			        this.imageTopPane.setBackground(null);
+			        this.textImageTop.setText(null);
+		        } else {
+	        	  System.out.println("画像は存在しません");
+		        }
+	    	}
+		}
+    }
+
+    event.setDropCompleted(success);
+    event.consume();
+    }
+    
+    public static String getFileName(String pass) {
+    	   String pattern = "((.*)/)*(.*)";
+    	   Pattern p = Pattern.compile(pattern);
+    	   Matcher m = p.matcher(pass);
+    	   if (m.find()) {
+    	       return m.group(3);
+    	   } else {
+    	       return "";
+    	   }
+    	}
+    
+    public static String getDirName(String pass) {
+    	   String pattern = "((.*)/)(.*)";
+    	   Pattern p = Pattern.compile(pattern);
+    	   Matcher m = p.matcher(pass);
+    	   if (m.find()) {
+    	       return m.group(1);
+    	   } else {
+    	       return "";
+    	   }
+    	}
+    
+    /*
+     * 先頭文字削除
+     */
+    public static String trimStart(String target, String prefix) {
+          if (target.startsWith(prefix)) {
+                return (target.substring(prefix.length()));
+          }
+          return target;
+    }
+    /*
+     * 末尾文字削除
+     */
+    public static String trimEnd(String target, String suffix) {
+          if (target.endsWith(suffix)) {
+                return (target.substring(0, target.length() - suffix.length()));
+          }
+          return target;
+    }
+    
+    
+    @FXML
     public void folderOpenActionBottom() {
     	FileChooser fc = new FileChooser();
     	fc.getExtensionFilters().addAll(
@@ -124,6 +314,7 @@ public class PrimaryController {
 	    	System.out.println(file.getPath());
 	    	this.ImagePath = file.getParent();
 	        Image img = new Image("file:" + file.getPath());
+	        this.ImageName = file.getName();
 	        this.imageB.setImage(img);
 	        this.imageBottomPane.setBackground(null);
 	        this.textImageBottom.setText(null);
@@ -186,7 +377,7 @@ public class PrimaryController {
         this.textImageMixed.setText(this.TEXTIMAGEMIXED_DEF);
         this.threshold.setText(this.THRESHOLD_DEF);
         this.checkRowCount.setText(this.ROWCOUNT_DEF);
-        this.textSaveName.setText(null);
+        this.textSaveName.setText("");
     }
     
     @FXML
@@ -226,7 +417,7 @@ public class PrimaryController {
         	
         	return;
     	}
-        Pattern patternThreshold = Pattern.compile("^(0)(\\.[0-9]+[1-9])$");
+        Pattern patternThreshold = Pattern.compile("^(0)(\\.[0-9]+)$");
         Matcher matcherThreshold = patternThreshold.matcher(this.threshold.getText());
         
         if (matcherThreshold.find()) {
@@ -331,8 +522,12 @@ public class PrimaryController {
     	System.out.println("topSameRows : " + topSameRows);
     	System.out.println("bottomSameRows : " + bottomSameRows);
 
+    	Boolean sameImageFlg = false;
+    	
+    	if(topSameRows == tHeight + 2) sameImageFlg = true;
 
     	int tAfterHeight = tHeight - bottomSameRows;
+    	if(tAfterHeight < 0) tAfterHeight = tHeight;
         int[]                           topAfterPixels  = new int[ tWidth * tAfterHeight];
         int topIndex = 0;
         
@@ -346,7 +541,8 @@ public class PrimaryController {
 	        }
 	    }
 
-    	int bAfterHeight = bHeight - topSameRows;    	
+    	int bAfterHeight = bHeight - topSameRows; 
+    	if(bAfterHeight < 0) bAfterHeight = bHeight;   	
         int[]                           bottomAfterPixels  = new int[ bWidth * bAfterHeight];
 	        // ピクセルmHeight
 	    for( int y = topSameRows ; y < bHeight; y++ ) {
@@ -359,6 +555,15 @@ public class PrimaryController {
 	    }	    
 
 	    int checkRowCount = Integer.parseInt(this.checkRowCount.getText());
+	    if(checkRowCount > bHeight - topSameRows) {
+        	Alert alrtRowCount = new Alert(AlertType.WARNING); //アラートを作成
+        	alrtRowCount.setTitle("縦重複範囲");
+        	alrtRowCount.setHeaderText(null);
+        	alrtRowCount.setContentText("縦重複範囲が大きすぎます");
+        	alrtRowCount.showAndWait(); //表示
+        	
+        	return;
+	    }
     	System.out.println("checkRowCount : " + checkRowCount);
         int[]                           checkSameRow  = new int[ bWidth * checkRowCount ];
         // ピクセルmHeight
@@ -435,17 +640,33 @@ public class PrimaryController {
     	System.out.println("似ている画素数 : " + maxSamePixels + "px");
 
 
-    	int tCutAfterHeight = maxSameRow;	
-        int[]                           topCutAfterPixels  = new int[ tWidth * tCutAfterHeight];
-        
-	    for( int y = 0; y < tCutAfterHeight; y++) {
-	        for( int x = 0 ; x < tWidth ; x++ ) {
-	        	int index = ( y * tWidth ) + x;
-	            int pixel   = topAfterPixels[ index ];
-	            topCutAfterPixels[index] = pixel;
-	            topIndex = index + 1;
-	        }
-	    }
+    	int tCutAfterHeight = 0;	
+        int[]                           topCutAfterPixels;
+    	if(maxSameRow != 0) {
+        	tCutAfterHeight = maxSameRow;	
+            topCutAfterPixels  = new int[ tWidth * tCutAfterHeight];
+            
+    	    for( int y = 0; y < tCutAfterHeight; y++) {
+    	        for( int x = 0 ; x < tWidth ; x++ ) {
+    	        	int index = ( y * tWidth ) + x;
+    	            int pixel   = topAfterPixels[ index ];
+    	            topCutAfterPixels[index] = pixel;
+    	            topIndex = index + 1;
+    	        }
+    	    }
+    	} else {
+        	tCutAfterHeight = tAfterHeight;	
+            topCutAfterPixels  = new int[ tWidth * tCutAfterHeight];
+            
+    	    for( int y = 0; y < tCutAfterHeight; y++) {
+    	        for( int x = 0 ; x < tWidth ; x++ ) {
+    	        	int index = ( y * tWidth ) + x;
+    	            int pixel   = topAfterPixels[ index ];
+    	            topCutAfterPixels[index] = pixel;
+    	            topIndex = index + 1;
+    	        }
+    	    }
+    	}
     	System.out.println("topIndex : " + topIndex);
 	    
     	int sameRows = bottomSameRows + topSameRows + (tAfterHeight - tCutAfterHeight);
@@ -453,6 +674,8 @@ public class PrimaryController {
     	System.out.println("sameMixPixels : " + sameMixPixels);
     	int mWidth = tWidth;
     	int mHeight = tHeight + bHeight - sameRows;
+    	if(mHeight < 0) mHeight = tHeight + bHeight;
+    	
     	System.out.println("mWidth : " + mWidth);
     	System.out.println("mHeight : " + mHeight);
         int[]                           mixPixels  = new int[ mWidth * mHeight];
@@ -481,6 +704,37 @@ public class PrimaryController {
        }
         System.out.println("mixed");
 
+    	
+    	if(sameImageFlg) {
+        	System.out.println("sameImageMixStart");
+        	mWidth = tWidth;
+        	mHeight = tHeight + bHeight;
+        	mixPixels  = new int[ mWidth * mHeight];
+        	mImg        = new WritableImage( mWidth , mHeight);
+        	writer      = mImg.getPixelWriter();
+
+        	topIndex = tWidth * tHeight;
+            // ピクセルmHeight
+            for( int y = 0 ; y < mHeight ; y++ ) {
+                for( int x = 0 ; x < mWidth ; x++ )
+                {
+                    int index   = ( y * mWidth ) + x;
+                	//System.out.println("index : " + index);
+                    
+                    if(index < topIndex) {
+                    	//System.out.println("topIndex : " + index);
+                        int pixel   = topPixels[ index ];
+                    	mixPixels[ index ] = pixel;
+                    } else {
+                    	int bottomIndex = index - topIndex;                	
+                        int pixel   = bottomPixels[ bottomIndex ];
+                    	mixPixels[ index ] = pixel;
+                    }
+                }
+           }
+    	}
+    	
+
         //作成したいファイルのパスを渡してFileオブジェクトを作成
         File newfile = new File(this.ImagePath + "\\結合後\\");
         //mkdirメソッドを実行
@@ -497,7 +751,7 @@ public class PrimaryController {
        
 	   String woext = this.ImageName.substring(0,this.ImageName.lastIndexOf('.'));
    	   String saveFileName = woext.replaceAll("[0-9]", "");
-   	   if(!this.textSaveName.getText().isBlank()) {
+   	   if(!this.textSaveName.getText().isEmpty() && !this.textSaveName.getText().isBlank()) {
    		   saveFileName = this.textSaveName.getText();
    	   }
    	   saveFileName = this.ImagePath + "\\結合後\\" + saveFileName;
@@ -506,30 +760,43 @@ public class PrimaryController {
 		int imageCount = 1;
 		String saveFileNameOrg = saveFileName.substring(0,saveFileName.lastIndexOf('.'));
 
-		while(true) {
+		if(!this.saveCheck.isSelected()) {
+			while(true) {
 
-		    Path p = Paths.get(saveFileName);
-	        if (Files.exists(p)){
-	        	imageCount++;
-	    		Integer i = Integer.valueOf(imageCount);
-	    		String fileNumTNext = i.toString();
-	        	saveFileName = saveFileNameOrg + "_" + fileNumTNext + ".png";
+			    Path p = Paths.get(saveFileName);
+		        if (Files.exists(p)){
+		        	imageCount++;
+		    		Integer i = Integer.valueOf(imageCount);
+		    		String fileNumTNext = i.toString();
+		        	saveFileName = saveFileNameOrg + "_" + fileNumTNext + ".png";
 
-	        }else {
-	            File f = new File(saveFileName);
+		        }else {
+		            File f = new File(saveFileName);
 
-	            try {
-	     		ImageIO.write(SwingFXUtils.fromFXImage(mImg, null), "png", f);
-	     		
-	     		} catch (IOException e) {
-	     			// TODO 自動生成された catch ブロック
-	     			e.printStackTrace();
-	     		}
-	            
-	            
-				break;
-	        }
-	   }
+		            try {
+		     		ImageIO.write(SwingFXUtils.fromFXImage(mImg, null), "png", f);
+		     		
+		     		} catch (IOException e) {
+		     			// TODO 自動生成された catch ブロック
+		     			e.printStackTrace();
+		     		}
+		            
+		            
+					break;
+		        }
+		   }
+		} else {
+            File f = new File(saveFileName);
+
+            try {
+     		ImageIO.write(SwingFXUtils.fromFXImage(mImg, null), "png", f);
+     		
+     		} catch (IOException e) {
+     			// TODO 自動生成された catch ブロック
+     			e.printStackTrace();
+     		}
+            
+		}
        System.out.println("savedName : " + saveFileName);
        this.mixedImage.setImage(mImg);
        this.imageMixedPane.setBackground(null);

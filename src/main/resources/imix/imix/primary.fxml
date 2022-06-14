@@ -16,7 +16,7 @@
 
 <AnchorPane prefHeight="797.0" prefWidth="889.0" style="-fx-background-color: #66CC99;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="imix.imix.PrimaryController">
    <children>
-      <Button fx:id="imageMixButton" alignment="CENTER" contentDisplay="CENTER" layoutX="379.0" layoutY="347.0" mnemonicParsing="false" onMouseClicked="#imageMixing" prefHeight="52.0" prefWidth="135.0" style="-fx-background-color: #003366;" text="画像を結合" textAlignment="CENTER" textFill="WHITE">
+      <Button fx:id="imageMixButton" alignment="CENTER" contentDisplay="CENTER" layoutX="379.0" layoutY="339.0" mnemonicParsing="false" onMouseClicked="#imageMixing" prefHeight="52.0" prefWidth="135.0" style="-fx-background-color: #003366;" text="画像を結合" textAlignment="CENTER" textFill="WHITE">
          <font>
             <Font name="System Bold" size="21.0" />
          </font>
@@ -31,7 +31,7 @@
                   <Font name="System Bold Italic" size="22.0" />
                </font>
             </Text>
-            <ImageView fx:id="imageT" fitHeight="377.0" fitWidth="325.0" onMouseClicked="#folderOpenActionTop" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="imageT" fitHeight="377.0" fitWidth="325.0" onDragDropped="#imageTopDragDropped" onDragOver="#imageTopDragOver" onMouseClicked="#folderOpenActionTop" pickOnBounds="true" preserveRatio="true">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
@@ -45,7 +45,7 @@
                   <Font name="System Bold Italic" size="22.0" />
                </font>
             </Text>
-            <ImageView fx:id="imageB" fitHeight="377.0" fitWidth="325.0" onMouseClicked="#folderOpenActionBottom" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="imageB" fitHeight="377.0" fitWidth="325.0" onDragDropped="#imageBottomDragDropped" onDragOver="#imageBottomDragOver" onMouseClicked="#folderOpenActionBottom" pickOnBounds="true" preserveRatio="true">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
@@ -54,7 +54,7 @@
       </StackPane>
       <StackPane fx:id="imageMixedPane" layoutX="545.0" layoutY="14.0" prefHeight="767.0" prefWidth="330.0" style="-fx-background-color: TEAL;">
          <children>
-            <Text fx:id="textImageMixed" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="ここに画像が出力されます">
+            <Text fx:id="textImageMixed" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="ここに結合した画像が出力されます">
                <font>
                   <Font name="System Bold Italic" size="22.0" />
                </font>
@@ -72,28 +72,28 @@
          </font></Text>
       <TextField fx:id="checkRowCount" layoutX="356.0" layoutY="208.0" prefHeight="31.0" prefWidth="178.0" promptText="ここに重複範囲を入力" text="50" />
       <TextField fx:id="threshold" layoutX="356.0" layoutY="281.0" prefHeight="31.0" prefWidth="178.0" promptText="ここに閾値を入力" text="0.7" />
-      <TextField fx:id="textSaveName" layoutX="356.0" layoutY="427.0" prefHeight="31.0" prefWidth="178.0" promptText="保存名を入力" />
-      <Text layoutX="356.0" layoutY="480.0" strokeType="OUTSIDE" strokeWidth="0.0" text="・画像は結合後、自動で保存されます">
+      <TextField fx:id="textSaveName" layoutX="358.0" layoutY="454.0" prefHeight="31.0" prefWidth="178.0" promptText="保存名を入力" />
+      <Text layoutX="357.0" layoutY="506.0" strokeType="OUTSIDE" strokeWidth="0.0" text="・画像は結合後、自動で保存されます">
          <font>
             <Font size="12.0" />
          </font>
       </Text>
-      <Text layoutX="356.0" layoutY="422.0" strokeType="OUTSIDE" strokeWidth="0.0" text="保存名">
+      <Text layoutX="357.0" layoutY="450.0" strokeType="OUTSIDE" strokeWidth="0.0" text="保存名">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>
       </Text>
-      <Text layoutX="356.0" layoutY="497.0" strokeType="OUTSIDE" strokeWidth="0.0" text="・保存名は未入力の場合、上側の">
+      <Text layoutX="357.0" layoutY="523.0" strokeType="OUTSIDE" strokeWidth="0.0" text="・保存名は未入力の場合、上側の">
          <font>
             <Font size="12.0" />
          </font>
       </Text>
-      <Text layoutX="356.0" layoutY="514.0" strokeType="OUTSIDE" strokeWidth="0.0" text="画像名が優先されます">
+      <Text layoutX="357.0" layoutY="540.0" strokeType="OUTSIDE" strokeWidth="0.0" text="画像名が優先されます">
          <font>
             <Font size="12.0" />
          </font>
       </Text>
-      <Button fx:id="resetButton" alignment="CENTER" contentDisplay="CENTER" layoutX="377.0" layoutY="531.0" mnemonicParsing="false" onMouseClicked="#resetImage" prefHeight="52.0" prefWidth="135.0" style="-fx-background-color: #003366;" text="リセット" textAlignment="CENTER" textFill="WHITE">
+      <Button fx:id="resetButton" alignment="CENTER" contentDisplay="CENTER" layoutX="378.0" layoutY="557.0" mnemonicParsing="false" onMouseClicked="#resetImage" prefHeight="52.0" prefWidth="135.0" style="-fx-background-color: #003366;" text="リセット" textAlignment="CENTER" textFill="WHITE">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
@@ -101,5 +101,6 @@
             <Font name="System Bold" size="21.0" />
          </font>
       </Button>
+      <CheckBox fx:id="saveCheck" layoutX="359.0" layoutY="406.0" mnemonicParsing="false" selected="true" text="結合画像を上書きする" />
    </children>
 </AnchorPane>
